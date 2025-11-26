@@ -3,7 +3,8 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const port = process.env.port || 5000
+const port = process.env.PORT || 5000;
+
 
 
 app.use(cors());
@@ -54,6 +55,24 @@ app.post('/courses', async (req, res) =>{
     const result = await courseCollection.insertOne(newCourse)
     res.send(result)
 })
+
+//  DELETE a course by ID
+app.delete("/courses/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await courseCollection.deleteOne({ _id: new ObjectId(id) });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).send({ message: "Course not found" });
+    }
+
+    res.send({ message: "Course deleted successfully" });
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).send({ message: "Failed to delete course" });
+  }
+});
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
